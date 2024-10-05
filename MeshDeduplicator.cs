@@ -8,6 +8,7 @@ using UnityEngine;
 public class MeshDeduplicator : MonoBehaviour, VRC.SDKBase.IEditorOnly
 {
 	public bool deduplicateOnUpload = true;
+	public bool debugLog = false;
 	// Start is called before the first frame update
 	void Start(){
 	}
@@ -18,10 +19,12 @@ public class MeshDeduplicator : MonoBehaviour, VRC.SDKBase.IEditorOnly
 	}
 	
 	void OnEnable(){
-		Debug.Log("Truncate Test: 1.23456789 -> " + TruncateFloat(1.23456789f));
-		Debug.Log("Truncate Test: 1345 -> " + TruncateFloat(1345f));
-		Debug.Log("Truncate Test: 0.00000001 -> " + TruncateFloat(0.00000001f));
-		Debug.Log("Truncate Test: 1234567890 -> " + TruncateFloat(1234567890f));
+		if(debugLog){
+			Debug.Log("Truncate Test: 1.23456789 -> " + TruncateFloat(1.23456789f));
+			Debug.Log("Truncate Test: 1345 -> " + TruncateFloat(1345f));
+			Debug.Log("Truncate Test: 0.00000001 -> " + TruncateFloat(0.00000001f));
+			Debug.Log("Truncate Test: 1234567890 -> " + TruncateFloat(1234567890f));
+		}
 		if(!deduplicateOnUpload){
 			DeduplicateMeshes();
 		}
@@ -146,16 +149,23 @@ public class MeshDeduplicator : MonoBehaviour, VRC.SDKBase.IEditorOnly
 		DisplayProgress(0);
 		foreach(SkinnedMeshRenderer skinnedMeshRenderer in skinnedMeshRenderers){
 			Mesh mesh = skinnedMeshRenderer.sharedMesh;
+			if(!mesh){
+				return;
+			}
 			string hash = HashMesh(mesh);
 			if(!meshDictionary.ContainsKey(hash)){
 				meshDictionary.Add(hash, mesh);
-				Debug.Log(hash);
-				Debug.Log("Found " + GetScenePath(skinnedMeshRenderer.gameObject) /*+ " " + AssetDatabase.GetAssetPath(skinnedMeshRenderer.sharedMesh)*/);
-				// Debug.Log(AssetDatabase.GetAssetPath(mesh));
+				if(debugLog){
+						Debug.Log(hash);
+						Debug.Log("Found " + GetScenePath(skinnedMeshRenderer.gameObject) /*+ " " + AssetDatabase.GetAssetPath(skinnedMeshRenderer.sharedMesh)*/);
+						// Debug.Log(AssetDatabase.GetAssetPath(mesh));
+				}
 			}else{
-				// Debug.Log("Replacing mesh for " + skinnedMeshRenderer.name);
-				Debug.Log("Replacing " + GetScenePath(skinnedMeshRenderer.gameObject));
-				// Debug.Log(AssetDatabase.GetAssetPath(skinnedMeshRenderer.sharedMesh));
+				if(debugLog){
+					// Debug.Log("Replacing mesh for " + skinnedMeshRenderer.name);
+					Debug.Log("Replacing " + GetScenePath(skinnedMeshRenderer.gameObject));
+					// Debug.Log(AssetDatabase.GetAssetPath(skinnedMeshRenderer.sharedMesh));
+				}
 				skinnedMeshRenderer.sharedMesh = meshDictionary[hash];
 				// Debug.Log(AssetDatabase.GetAssetPath(skinnedMeshRenderer.sharedMesh));
 			}
@@ -165,14 +175,21 @@ public class MeshDeduplicator : MonoBehaviour, VRC.SDKBase.IEditorOnly
 		}
 		foreach(MeshFilter meshFilter in meshFilters){
 			Mesh mesh = meshFilter.sharedMesh;
+			if(!mesh){
+				return;
+			}
 			string hash = HashMesh(mesh);
 			if(!meshDictionary.ContainsKey(hash)){
 				meshDictionary.Add(hash, mesh);
-				Debug.Log(hash);
-				Debug.Log("Found " + GetScenePath(meshFilter.gameObject));
+				if(debugLog){
+					Debug.Log(hash);
+					Debug.Log("Found " + GetScenePath(meshFilter.gameObject));
+				}
 			}else{
 				meshFilter.sharedMesh = meshDictionary[hash];
-				Debug.Log("Replacing " + GetScenePath(meshFilter.gameObject));
+				if(debugLog){
+					Debug.Log("Replacing " + GetScenePath(meshFilter.gameObject));
+				}
 			}
 			// Debug.Log(mesh.name);
 			doneCount++;
