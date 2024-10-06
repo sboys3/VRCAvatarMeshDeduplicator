@@ -150,7 +150,7 @@ public class MeshDeduplicator : MonoBehaviour, VRC.SDKBase.IEditorOnly
 		foreach(SkinnedMeshRenderer skinnedMeshRenderer in skinnedMeshRenderers){
 			Mesh mesh = skinnedMeshRenderer.sharedMesh;
 			if(!mesh){
-				return;
+				continue;
 			}
 			string hash = HashMesh(mesh);
 			if(!meshDictionary.ContainsKey(hash)){
@@ -176,7 +176,7 @@ public class MeshDeduplicator : MonoBehaviour, VRC.SDKBase.IEditorOnly
 		foreach(MeshFilter meshFilter in meshFilters){
 			Mesh mesh = meshFilter.sharedMesh;
 			if(!mesh){
-				return;
+				continue;
 			}
 			string hash = HashMesh(mesh);
 			if(!meshDictionary.ContainsKey(hash)){
